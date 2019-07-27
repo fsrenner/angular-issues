@@ -8,10 +8,14 @@ class Issues extends React.Component {
     state = {
         issues:[],
         totalPages: 0,
-        page: 1
+        page: 1,
+        isLoading: true
     };
 
     fetchIssuesData = (date, page) => {
+        this.setState({
+            isLoading: true
+        })
         Axios.get(`https://api.github.com/repos/angular/angular/issues?since=${date}&page=${page}`)
             .then(results => {
                 const data = results.data;
@@ -25,7 +29,8 @@ class Issues extends React.Component {
                 });
                 console.log(JSON.stringify(issues, null, 2));
                 this.setState({
-                    issues
+                    issues,
+                    isLoading: false
                 });
             })
             .catch(err => {
@@ -65,31 +70,40 @@ class Issues extends React.Component {
     render () {
         const { 
             issues,
-            totalPages
+            totalPages,
+            isLoading
          } = this.state;
 
         return (
             <React.Fragment>
-            <ReactPaginate
-                previousLabel={'<'}
-                nextLabel={'>'}
-                breakLabel={'...'}
-                breakClassName={'break-me'}
-                pageCount={totalPages}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={5}
-                onPageChange={this.handlePageClick}
-                containerClassName={'pagination'}
-                subContainerClassName={'pages pagination'}
-                activeClassName={'active'}
-              />
-            
-          <div className="card">
-              {issues.map(issue => {
-                  return <Issue title={issue.title} body={issue.body} user={issue.user} assignee={issue.assignee} />;
-              })}
-              </div>
-          </React.Fragment>
+                <div className="formatter">
+                <ReactPaginate
+                    previousLabel={'<'}
+                    nextLabel={'>'}
+                    breakLabel={'...'}
+                    breakClassName={'break-me'}
+                    pageCount={totalPages}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={5}
+                    onPageChange={this.handlePageClick}
+                    containerClassName={'pagination'}
+                    subContainerClassName={'pages pagination'}
+                    activeClassName={'active'}
+                />
+                {(isLoading) 
+                    ? <div class="text-right">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    : null}
+                </div>
+                <div className="card">
+                    {issues.map(issue => {
+                        return <Issue title={issue.title} body={issue.body} user={issue.user} assignee={issue.assignee} />;
+                    })}
+                </div>
+            </React.Fragment>
         );
     }
 }
