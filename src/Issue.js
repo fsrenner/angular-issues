@@ -1,40 +1,35 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
-const useStyles = makeStyles(theme => ({
-    card: {
-        maxWidth: 500,
-    }
-}));
 
-const Issue = (props) => {
-    const classes = useStyles();
+const Issue = props => {
+
     const {
         title,
         body,
         user,
         assignee
     } = props;
+
     return(
-        <Card className={classes.card}>
-            <CardHeader
-                title={title}
-                subheader={user}
-            />
-            <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p">
-                    {body}
-                </Typography>
-            </CardContent>
-            <Typography>{assignee}</Typography>
-        </Card>
+        <div className="card">
+            <div className="card-body">
+                <h5 className="card-title">{title}</h5>
+                <h6 className="card-title">{user}</h6>
+                <p className="card-text">{body}</p>
+            </div>
+            <div className="card-footer">
+                <small className="text-muted">Assignee: {assignee}</small>
+            </div>
+        </div>
     );
+};
+
+Issue.propTypes = {
+    title: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+    user: PropTypes.string.isRequired,
+    assignee: PropTypes.string.isRequired,
 };
 
 export default Issue;
