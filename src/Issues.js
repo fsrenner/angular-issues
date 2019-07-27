@@ -1,5 +1,6 @@
 import React from 'react';
 import Axios from 'axios';
+import ReactPaginate from 'react-paginate';
 import Issue from './Issue';
 
 class Issues extends React.Component {
@@ -10,25 +11,8 @@ class Issues extends React.Component {
         page: 1
     };
 
-    componentDidMount () {
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-        console.log(sevenDaysAgo);
-        Axios.head(`https://api.github.com/repos/angular/angular/issues?since=${sevenDaysAgo}`)
-            .then(response => {
-                let totalPages = response.headers.link.split(',');
-                totalPages = totalPages[totalPages.length - 1];
-                totalPages = totalPages.split(';');
-                totalPages = totalPages[0];
-                totalPages = totalPages.split('&');
-                totalPages = totalPages[totalPages.length - 1];
-                totalPages = totalPages.replace('page=', '');
-                totalPages = totalPages.replace('>', '');
-                console.info("Total Pages:", totalPages)
-                this.setState({
-                    totalPages
-                });
-            });
-        Axios.get(`https://api.github.com/repos/angular/angular/issues?since=${sevenDaysAgo}`)
+    fetchIssuesData = (date, page) => {
+        Axios.get(`https://api.github.com/repos/angular/angular/issues?since=${date}&page=${page}`)
             .then(results => {
                 const data = results.data;
                 const issues = data.map(issue => {
@@ -49,15 +33,63 @@ class Issues extends React.Component {
             });
     }
 
+    componentDidMount () {
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        console.log(sevenDaysAgo);
+        Axios.head(`https://api.github.com/repos/angular/angular/issues?since=${sevenDaysAgo}`)
+            .then(response => {
+                let totalPages = response.headers.link.split(',');
+                totalPages = totalPages[totalPages.length - 1];
+                totalPages = totalPages.split(';');
+                totalPages = totalPages[0];
+                totalPages = totalPages.split('&');
+                totalPages = totalPages[totalPages.length - 1];
+                totalPages = totalPages.replace('page=', '');
+                totalPages = totalPages.replace('>', '');
+                totalPages = Number(totalPages);
+                console.info("Total Pages:", totalPages)
+                this.setState({
+                    totalPages
+                });
+            });
+        this.fetchIssuesData(sevenDaysAgo, this.state.page);
+    }
+
+    handlePageClick = data => {
+        let selected = data.selected + 1;
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        console.log(selected);
+        this.fetchIssuesData(sevenDaysAgo, selected);
+    }
+
     render () {
-        const { issues } = this.state;
+        const { 
+            issues,
+            totalPages
+         } = this.state;
 
         return (
+            <React.Fragment>
+            <ReactPaginate
+                previousLabel={'<'}
+                nextLabel={'>'}
+                breakLabel={'...'}
+                breakClassName={'break-me'}
+                pageCount={totalPages}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={this.handlePageClick}
+                containerClassName={'pagination'}
+                subContainerClassName={'pages pagination'}
+                activeClassName={'active'}
+              />
+            
           <div className="card">
               {issues.map(issue => {
                   return <Issue title={issue.title} body={issue.body} user={issue.user} assignee={issue.assignee} />;
               })}
-          </div>
+              </div>
+          </React.Fragment>
         );
     }
 }

@@ -10,3 +10,25 @@ h1 {
 .card-title:first-child {
   font-weight: 700!important;
 }
+
+#root ul {
+  display: inline-block;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+#root li {
+  display: inline-block;
+}
+
+.pagination li {
+  padding: 5px 20px 5px 20px;
+  border: 1px solid #777;
+  color: #777;
+  text-decoration: none
+}
+
+.pagination .active {
+  background-color: #777;
+  color: #fff;
+}
