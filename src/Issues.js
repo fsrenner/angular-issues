@@ -27,7 +27,6 @@ class Issues extends React.Component {
                         assignee: (issue.assignee && issue.assignee.login) ? issue.assignee.login : 'None'
                     }
                 });
-                console.log(JSON.stringify(issues, null, 2));
                 this.setState({
                     issues,
                     isLoading: false
@@ -52,7 +51,6 @@ class Issues extends React.Component {
                 totalPages = totalPages.replace('page=', '');
                 totalPages = totalPages.replace('>', '');
                 totalPages = Number(totalPages);
-                console.info("Total Pages:", totalPages)
                 this.setState({
                     totalPages
                 });
@@ -63,7 +61,6 @@ class Issues extends React.Component {
     handlePageClick = data => {
         let selected = data.selected + 1;
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-        console.log(selected);
         this.fetchIssuesData(sevenDaysAgo, selected);
     }
 
